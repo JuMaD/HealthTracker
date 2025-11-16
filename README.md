@@ -1,158 +1,206 @@
-# HealthTracker 🏥📊
+# Lab Results Manager
 
-> A modern, privacy-focused health and fitness tracking application
+> A Python-based desktop application for managing and visualizing medical lab results
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-14+-black)](https://nextjs.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue)](https://www.postgresql.org/)
+![Lab Results Manager UI](img.png)
 
-## 🌟 Overview
+## Overview
 
-HealthTracker is a comprehensive health and wellness tracking application designed to help users monitor their health metrics, activities, nutrition, and fitness goals—all while maintaining complete privacy and control over their data.
+The Lab Results Manager is a Python desktop application designed to help you manage and visualize medical lab results (e.g., from blood tests) efficiently while keeping all data and processing locally on your machine. Track your health metrics over time, visualize trends, and generate professional reports—all with complete privacy.
 
-### ✨ Key Features (Planned)
+## Features
 
-- 📈 **Health Metrics Tracking** - Monitor weight, blood pressure, heart rate, and more
-- 🏃 **Activity Logging** - Track workouts, exercises, and daily activities
-- 🥗 **Nutrition Management** - Log meals and track macronutrients
-- 🎯 **Goal Setting** - Set and track personalized health and fitness goals
-- 📊 **Analytics & Insights** - Visualize trends and get actionable insights
-- 🔒 **Privacy-First** - Your data stays yours with optional client-side encryption
-- 📱 **Progressive Web App** - Works seamlessly on desktop, mobile, and offline
-- 🔄 **Data Portability** - Export your data anytime in standard formats
+- ✅ **Add New Lab Results** - Easily input new lab data with measurement type, value, date, and unit
+- ✅ **Update Reference Ranges** - Edit normal value boundaries (Grenzwerte) for any measurement type
+- ✅ **Generate Time-Series Plots** - Automatically visualize how values change over time with normal range overlays
+- ✅ **Export Reports** - Export data and plots to Excel and PDF formats with customizable selections
+- ✅ **Display Graphs** - View existing plots directly in the application
+- ✅ **Date Handling** - Consistent date formatting (mm/dd/yy) throughout the application
+- ✅ **Privacy-First** - All data stored locally, no cloud dependencies
 
-## 🚀 Project Status
+## Requirements
 
-**Current Phase:** Architecture & Planning
+- Python 3.8 or higher
+- Required Python packages:
+  - `pandas` - Data manipulation
+  - `matplotlib` - Plotting and visualization
+  - `openpyxl` - Excel export
+  - `fpdf` - PDF generation
+  - `Pillow` - Image handling
 
-The project is currently in the architecture and planning phase. The technical foundation has been designed with modern best practices in mind. We're ready to begin implementation!
+## Installation
 
-### 📋 Roadmap
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/JuMaD/HealthTracker.git
+   cd HealthTracker
+   ```
 
-- [x] Architecture design
-- [x] Documentation
-- [ ] Project setup (Next.js + TypeScript)
-- [ ] Database schema implementation
-- [ ] Authentication system
-- [ ] Core features development
-- [ ] Testing & quality assurance
-- [ ] Beta launch
+2. Install the required packages:
+   ```bash
+   pip install pandas matplotlib openpyxl fpdf Pillow
+   ```
 
-## 🏗️ Architecture
+   Or using a requirements file:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-HealthTracker is built with a modern, serverless-first architecture:
+## Usage
 
-- **Frontend:** Next.js 14+ with TypeScript, React, and Tailwind CSS
-- **Backend:** Serverless functions (Next.js API routes)
-- **Database:** PostgreSQL with Prisma ORM
-- **Authentication:** NextAuth.js with multiple providers
-- **Hosting:** Vercel for frontend & serverless, Supabase for database
-- **PWA:** Full offline support with service workers
+1. **Run the Application**:
+   ```bash
+   python LabDataManagerUI.py
+   ```
 
-For detailed architecture information, see [ARCHITECTURE_REVIEW.md](./ARCHITECTURE_REVIEW.md).
+2. **Add New Lab Results**:
+   - Use the "Add New Lab Result" section
+   - Choose an existing measurement type (`Bezeichnung`) or create a new one
+   - Enter the measurement value (`Wert`), date (`Datum` in mm/dd/yy format), and unit (`Einheit`)
+   - Click "Save" to store the result
 
-## 📚 Documentation
+3. **Edit Reference Ranges (Grenzwerte)**:
+   - Select a measurement type from the dropdown in the "Edit Grenzwerte" section
+   - View existing lower (`unterer Grenzwert`) and upper (`oberer Grenzwert`) values
+   - Modify them as needed
+   - Click "Update Grenzwerte" to apply changes across all entries
 
-This repository includes comprehensive documentation:
+4. **Generate Plots**:
+   - Click "Regenerate Plots" to create or update plots for all measurement types
+   - Plots are saved in the `plots/` directory
 
-- **[ARCHITECTURE_REVIEW.md](./ARCHITECTURE_REVIEW.md)** - Complete architectural design, technology decisions, security considerations, and scalability roadmap
-- **[IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)** - Step-by-step setup guide with code examples and configurations
-- **[CLAUDE.md](./CLAUDE.md)** - Development guidelines and conventions for AI assistants
+5. **Display Graphs**:
+   - Select a measurement from the "Display Existing Graphs" dropdown
+   - View the time-series plot directly in the application
 
-## 🛠️ Getting Started
+6. **Export Reports**:
+   - Use the "Generate Reports" section
+   - Select the measurements to include (multi-select with Ctrl/Cmd)
+   - Click "Generate Excel and PDF Report"
+   - Reports are saved as `lab_results_report.xlsx` and `lab_results_report.pdf`
 
-### Prerequisites
+## File Structure
 
-- Node.js 20+ (LTS)
-- PostgreSQL 15+ or Supabase account
-- npm or yarn package manager
-
-### Quick Start
-
-```bash
-# Clone the repository
-git clone https://github.com/JuMaD/HealthTracker.git
-cd HealthTracker
-
-# Follow the detailed setup instructions in IMPLEMENTATION_GUIDE.md
+```
+HealthTracker/
+├── LabDataManagerUI.py         # Main application with GUI
+├── Functions.py                # Core business logic functions
+├── lab_results_aug24.csv       # Data storage (created on first run)
+├── plots/                      # Generated PNG plots
+├── img.png                     # Application screenshot
+├── next.md                     # Planned features
+├── ARCHITECTURE_REVIEW.md      # Detailed architecture analysis and recommendations
+├── CLAUDE.md                   # Development guidelines for AI assistants
+├── LICENSE                     # MIT License
+└── README.md                   # This file
 ```
 
-> **Note:** The project setup instructions will be available once development begins. See [IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md) for the complete setup process.
+## Architecture & Modernization
 
-## 🔐 Security & Privacy
+This application works well but has room for improvement. For a comprehensive analysis of the current architecture and detailed recommendations for modernization, see:
 
-HealthTracker takes security and privacy seriously:
+**[ARCHITECTURE_REVIEW.md](./ARCHITECTURE_REVIEW.md)** - Includes:
+- Current architecture assessment
+- Strengths and weaknesses analysis
+- Modernization recommendations (SQLite, modern UI, web version)
+- Implementation roadmap
+- Priority improvements ranked by impact
 
-- ✅ **End-to-end encryption** for sensitive health data
-- ✅ **GDPR compliant** with data export and deletion
-- ✅ **HIPAA considerations** for US market
-- ✅ **No data selling** - your data is yours
-- ✅ **Transparent privacy policy**
-- ✅ **Regular security audits**
+### Key Improvement Opportunities
 
-For detailed security architecture, see [ARCHITECTURE_REVIEW.md - Security Architecture](./ARCHITECTURE_REVIEW.md#security-architecture).
+1. **Migrate to SQLite** - Better data integrity and query capabilities
+2. **Modernize UI** - Use CustomTkinter or move to web interface (Streamlit)
+3. **Automated Backups** - Prevent data loss
+4. **Separate Reference Values** - Better management with source citations
+5. **Multilanguage Support** - Expand beyond German/English
+6. **Enhanced Visualization** - Interactive plots with Plotly
+7. **CSV Import** - Import data from other sources
+8. **Standalone Distribution** - Package as executable with PyInstaller
 
-## 🧪 Testing
+See [ARCHITECTURE_REVIEW.md](./ARCHITECTURE_REVIEW.md) for detailed implementation guidance.
 
-The project will maintain high quality standards with comprehensive testing:
+## Planned Features
 
-- **Unit Tests** - For business logic and utilities
-- **Integration Tests** - For API endpoints and database operations
-- **E2E Tests** - For critical user flows
-- **Target Coverage** - 80%+ overall, 95%+ for critical paths
+From [next.md](./next.md):
+- Import CSV functionality with column mapping
+- Multi-language support for column names
+- Independent reference value management with citations
+- User-selectable reference ranges from multiple sources
+- Package as Windows and Mac applications
+- Improved time-series display (aspect ratio fixes)
+- Dummy data for documentation examples
 
-## 📱 Mobile Support
+## Data Format
 
-HealthTracker is designed as a **Progressive Web App (PWA)**, providing:
+Data is stored in CSV format with the following fields:
 
-- 📲 Installable on iOS and Android
-- 🔌 Full offline functionality
-- ⚡ Native-like performance
-- 🔄 Automatic updates
+| Field | Description | Example |
+|-------|-------------|---------|
+| Bezeichnung | Measurement type | Hemoglobin, Glucose |
+| Einheit | Unit | g/dL, mg/dL |
+| Wert | Measured value | 15.2, 95 |
+| Datum | Date (mm/dd/yy) | 08/15/24 |
+| unterer Grenzwert | Lower normal range | 13.5 |
+| oberer Grenzwert | Upper normal range | 17.5 |
 
-Native mobile apps may be developed in the future based on user demand.
+All dates are handled in `mm/dd/yy` format to ensure consistency.
 
-## 🤝 Contributing
+## Privacy & Security
 
-Contributions are welcome! Please read our contributing guidelines before submitting pull requests.
+- ✅ **Local Storage** - All data stays on your computer
+- ✅ **No Cloud Dependencies** - Works completely offline
+- ✅ **No Data Sharing** - Your health data is yours alone
+- ✅ **Open Source** - Review the code yourself
+
+## Development
+
+### Running Tests
+
+(Tests to be added - see ARCHITECTURE_REVIEW.md for recommendations)
+
+### Contributing
+
+Contributions are welcome! Please:
+
+1. Read [CLAUDE.md](./CLAUDE.md) for development guidelines
+2. Check [ARCHITECTURE_REVIEW.md](./ARCHITECTURE_REVIEW.md) for planned improvements
+3. Create a feature branch
+4. Submit a pull request
 
 ### Development Guidelines
 
-1. Follow the code conventions in [CLAUDE.md](./CLAUDE.md)
-2. Write tests for new features
-3. Update documentation as needed
-4. Follow the Git workflow outlined in the documentation
-5. Ensure all tests pass before submitting PRs
+See [CLAUDE.md](./CLAUDE.md) for:
+- Code conventions
+- Development workflows
+- AI assistant guidelines
+- Testing standards
 
-## 📄 License
+## Logging
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+The application includes detailed logging for all function calls via the `@log_function_call` decorator. This helps trace operations and debug issues. Logs include function names, arguments, and return values.
 
-## 🙏 Acknowledgments
+## License
 
-- Built with [Next.js](https://nextjs.org/)
-- Database by [Supabase](https://supabase.com/)
-- UI components from [shadcn/ui](https://ui.shadcn.com/)
-- Charts powered by [Recharts](https://recharts.org/)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📞 Contact & Support
+## Support
 
-- **Issues:** Please use the [GitHub Issues](https://github.com/JuMaD/HealthTracker/issues) page
-- **Discussions:** Join the conversation in [GitHub Discussions](https://github.com/JuMaD/HealthTracker/discussions)
+- **Issues**: Use the [GitHub Issues](https://github.com/JuMaD/HealthTracker/issues) page
+- **Discussions**: Join [GitHub Discussions](https://github.com/JuMaD/HealthTracker/discussions)
 
-## 🗺️ Vision
+## Roadmap
 
-Our vision is to create a health tracking platform that:
+**Current Version:** Python desktop application with Tkinter
 
-1. **Empowers users** with complete control over their health data
-2. **Respects privacy** through encryption and transparency
-3. **Provides insights** that help users achieve their health goals
-4. **Remains accessible** to everyone, regardless of budget
-5. **Supports interoperability** with other health platforms and devices
+**Future Versions:**
+- v2.0: SQLite database, modern UI (CustomTkinter)
+- v3.0: Web-based interface (Streamlit/Flask)
+- v4.0: Mobile support, cloud backup options
+
+See [ARCHITECTURE_REVIEW.md](./ARCHITECTURE_REVIEW.md) for the complete modernization roadmap.
 
 ---
 
-**Note:** This project is currently in the planning and architecture phase. Star and watch the repository to stay updated on development progress!
+**Built with ❤️ for better health tracking and data privacy**
 
-Built with ❤️ for better health tracking
+*Your health data should be yours, stored locally, and under your complete control.*

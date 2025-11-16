@@ -1,288 +1,474 @@
-# CLAUDE.md - AI Assistant Guide for HealthTracker
+# CLAUDE.md - AI Assistant Guide for Lab Results Manager
 
 > **Last Updated:** 2025-11-16
-> **Repository:** JuMaD/HealthTracker
+> **Repository:** JuMaD/HealthTracker (Lab Results Manager)
+> **Language:** Python 3.8+
 > **License:** MIT
-> **Status:** Initial Setup Phase
+> **Status:** Production - Active Desktop Application
 
 ## 📚 Essential Documentation
 
-Before starting development, review these key documents:
+Before working on this project, review these key documents:
 
-1. **[ARCHITECTURE_REVIEW.md](./ARCHITECTURE_REVIEW.md)** - Comprehensive architecture design, technology stack, security considerations, and scalability roadmap
-2. **[IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)** - Quick start guide with code examples, configuration files, and step-by-step setup
-3. **[CLAUDE.md](./CLAUDE.md)** (this file) - Development guidelines and conventions for AI assistants
+1. **[README.md](./README.md)** - User-facing documentation, installation, and usage
+2. **[ARCHITECTURE_REVIEW.md](./ARCHITECTURE_REVIEW.md)** - Comprehensive architecture analysis, modernization recommendations, and implementation roadmap
+3. **[next.md](./next.md)** - Planned features and improvements
+4. **[CLAUDE.md](./CLAUDE.md)** (this file) - Development guidelines for AI assistants
+
+---
 
 ## Table of Contents
 
 - [Project Overview](#project-overview)
-- [Current Repository State](#current-repository-state)
-- [Recommended Architecture](#recommended-architecture)
-- [Development Workflows](#development-workflows)
+- [Current Codebase Structure](#current-codebase-structure)
+- [Development Guidelines](#development-guidelines)
 - [Code Conventions](#code-conventions)
-- [AI Assistant Guidelines](#ai-assistant-guidelines)
-- [Security Considerations](#security-considerations)
 - [Testing Strategy](#testing-strategy)
+- [Common Tasks](#common-tasks)
+- [Modernization Priorities](#modernization-priorities)
 
 ---
 
 ## Project Overview
 
-**HealthTracker** is a health and fitness tracking application designed to help users monitor various health metrics, activities, and wellness data.
+**Lab Results Manager** is a Python desktop application for managing and visualizing medical lab results (blood tests, etc.). It provides a simple, privacy-focused solution for tracking health metrics over time.
 
 ### Purpose
-- Track health metrics (weight, blood pressure, heart rate, etc.)
-- Monitor fitness activities and exercise routines
-- Manage dietary information and nutrition
-- Visualize health trends over time
-- Set and track health goals
+- Track medical lab results (bloodwork, etc.)
+- Visualize health metrics over time
+- Manage reference ranges (normal values)
+- Export reports in Excel and PDF formats
+- Maintain complete data privacy (local storage)
 
 ### Target Users
 - Individuals managing personal health data
-- Fitness enthusiasts tracking workouts
-- Users monitoring chronic conditions
-- Anyone interested in wellness and preventive care
+- People with chronic conditions requiring regular lab monitoring
+- Anyone who wants to track lab results independently
+- Privacy-conscious users who want local-only data storage
+
+### Core Philosophy
+- **Privacy First** - All data stored locally, no cloud dependencies
+- **Simple & Focused** - Does one thing well
+- **Self-Contained** - No server, no complex setup
+- **User Control** - Complete ownership of health data
 
 ---
 
-## Current Repository State
+## Current Codebase Structure
 
 ### Repository Structure
 ```
 HealthTracker/
-├── .git/                          # Git version control
-├── ARCHITECTURE_REVIEW.md         # Comprehensive architecture design
-├── IMPLEMENTATION_GUIDE.md        # Quick start and setup guide
-├── CLAUDE.md                      # This file - AI guidelines
-└── LICENSE                        # MIT License
+├── LabDataManagerUI.py         # Main Tkinter GUI (320 lines)
+├── Functions.py                # Core business logic (129 lines)
+├── lab_results_aug24.csv       # Data storage (CSV format)
+├── plots/                      # Generated PNG visualizations
+├── .idea/                      # PyCharm IDE configuration
+├── img.png                     # Application screenshot
+├── next.md                     # Planned features
+├── ARCHITECTURE_REVIEW.md      # Architecture analysis & recommendations
+├── CLAUDE.md                   # This file
+├── LICENSE                     # MIT License
+└── README.md                   # User documentation
 ```
 
-### Status
-The repository is currently in its **architecture planning phase**. The architecture has been designed and documented. Ready to begin implementation following the [IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md).
+### Technology Stack
 
-### Next Steps for Development
-1. ✅ **Architecture Design** - Completed (see ARCHITECTURE_REVIEW.md)
-2. ⏸ **Set Up Project Structure** - Initialize Next.js with TypeScript
-3. ⏸ **Configure Database** - Set up Supabase/PostgreSQL with Prisma
-4. ⏸ **Implement Authentication** - Set up NextAuth.js
-5. ⏸ **Build Core Features** - Health metrics, activities, nutrition tracking
-6. ⏸ **Deploy** - Set up Vercel deployment with CI/CD
+```python
+Language:       Python 3.8+
+GUI Framework:  Tkinter (built-in)
+Data Storage:   CSV files via pandas
+Visualization:  matplotlib
+Export:         openpyxl (Excel), fpdf (PDF)
+Image Handling: Pillow (PIL)
+```
 
-See [IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md) for detailed steps.
+### Data Model
+
+**CSV Schema:**
+```
+Bezeichnung      - Measurement type (e.g., "Hemoglobin", "Glucose")
+Einheit          - Unit (e.g., "g/dL", "mg/dL")
+Wert             - Measured value (float)
+Datum            - Date in mm/dd/yy format
+unterer Grenzwert - Lower normal range boundary (float)
+oberer Grenzwert  - Upper normal range boundary (float)
+```
+
+### Core Components
+
+1. **LabDataManagerUI.py** - Main application
+   - Tkinter GUI with 4 main sections
+   - Event handlers for user interactions
+   - Data validation and error handling
+
+2. **Functions.py** - Business logic
+   - `import_sanitize()` - Load and clean CSV data
+   - `save_plots()` - Generate matplotlib time-series charts
+   - `export_to_excel()` - Create Excel reports
+   - `generate_pdf_report()` - Create PDF reports
+   - `@log_function_call` - Decorator for debugging
 
 ---
 
-## Recommended Architecture
+## Development Guidelines
 
-### Technology Stack Options
+### Setting Up Development Environment
 
-#### Option A: Full-Stack JavaScript/TypeScript
-```
-Frontend: React/Next.js + TypeScript
-Backend: Node.js + Express/Fastify
-Database: PostgreSQL/MongoDB
-Mobile: React Native (optional)
-```
+```bash
+# Clone repository
+git clone https://github.com/JuMaD/HealthTracker.git
+cd HealthTracker
 
-#### Option B: Python Backend
-```
-Frontend: React/Vue.js + TypeScript
-Backend: Python (FastAPI/Django)
-Database: PostgreSQL
-Mobile: Flutter/React Native (optional)
-```
+# Create virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-#### Option C: Modern Serverless
-```
-Frontend: Next.js/Nuxt.js
-Backend: Serverless Functions (Vercel/AWS Lambda)
-Database: Supabase/Firebase/PlanetScale
+# Install dependencies
+pip install pandas matplotlib openpyxl fpdf Pillow
+
+# Run application
+python LabDataManagerUI.py
 ```
 
-### Recommended Directory Structure
+### Development Workflow
 
-```
-HealthTracker/
-├── .github/              # GitHub Actions, templates
-│   └── workflows/        # CI/CD pipelines
-├── docs/                 # Additional documentation
-├── src/
-│   ├── api/             # Backend API code
-│   │   ├── controllers/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── middleware/
-│   │   └── utils/
-│   ├── client/          # Frontend application
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── hooks/
-│   │   ├── services/
-│   │   ├── styles/
-│   │   └── utils/
-│   └── shared/          # Shared types and utilities
-├── tests/
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
-├── scripts/             # Build and deployment scripts
-├── .env.example         # Environment variables template
-├── .gitignore
-├── package.json
-├── tsconfig.json
-├── README.md
-├── CONTRIBUTING.md
-├── CHANGELOG.md
-├── LICENSE
-└── CLAUDE.md           # This file
-```
+1. **Before Making Changes**
+   - Read relevant sections of ARCHITECTURE_REVIEW.md
+   - Check next.md for planned features
+   - Understand current code structure
+   - Create backup of lab_results_aug24.csv
 
----
+2. **While Developing**
+   - Follow PEP 8 style guide
+   - Add docstrings to new functions
+   - Use type hints where appropriate
+   - Test changes with real data
+   - Validate CSV integrity after modifications
 
-## Development Workflows
-
-### Git Branching Strategy
-
-#### Branch Naming Convention
-```
-feature/descriptive-name    # New features
-bugfix/issue-description    # Bug fixes
-hotfix/critical-fix         # Production hotfixes
-docs/what-changed          # Documentation updates
-refactor/what-refactored   # Code refactoring
-test/what-tested           # Test additions
-```
-
-#### Workflow
-1. Create feature branch from `main`
-2. Make changes with clear, atomic commits
-3. Write/update tests
-4. Update documentation
-5. Create Pull Request
-6. Code review and approval
-7. Merge to `main`
-
-### Commit Message Convention
-
-Follow **Conventional Commits** specification:
-
-```
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-```
-
-**Types:**
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting)
-- `refactor`: Code refactoring
-- `test`: Adding/updating tests
-- `chore`: Maintenance tasks
-- `perf`: Performance improvements
-
-**Examples:**
-```
-feat(api): add endpoint for blood pressure tracking
-fix(ui): resolve chart rendering issue on mobile
-docs(readme): update installation instructions
-test(auth): add unit tests for login flow
-```
+3. **Before Committing**
+   - Test all affected functionality
+   - Update documentation if needed
+   - Add entry to next.md if incomplete
+   - Ensure CSV file still loads correctly
 
 ---
 
 ## Code Conventions
 
-### General Principles
+### Python Style
 
-1. **Write Clean, Readable Code**
-   - Use meaningful variable and function names
-   - Keep functions small and focused (single responsibility)
-   - Add comments only when necessary to explain "why", not "what"
+Follow **PEP 8** guidelines:
 
-2. **Follow DRY (Don't Repeat Yourself)**
-   - Extract reusable logic into functions/utilities
-   - Create shared components for common UI elements
+```python
+# Good variable names
+measurement_type = "Hemoglobin"
+reference_range_lower = 13.5
+date_formatted = "08/15/24"
 
-3. **Error Handling**
-   - Always handle errors gracefully
-   - Provide meaningful error messages
-   - Log errors appropriately
+# Good function names
+def save_new_entry():
+    """Save a new lab result to CSV file."""
+    pass
 
-4. **Type Safety**
-   - Use TypeScript for type safety
-   - Define interfaces for data structures
-   - Avoid `any` type when possible
+def generate_plot_for_metric(metric_name):
+    """Generate time-series plot for specified metric."""
+    pass
+
+# Type hints (recommended for new code)
+from typing import Optional, List, Dict
+from datetime import date
+
+def get_measurements(
+    metric: str,
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None
+) -> List[Dict]:
+    """Retrieve measurements for a metric within date range."""
+    pass
+```
 
 ### Naming Conventions
 
-#### JavaScript/TypeScript
-```typescript
-// Variables and functions: camelCase
-const userName = "John";
-function calculateBMI() {}
-
-// Classes and Types: PascalCase
-class HealthMetric {}
-interface UserProfile {}
-type MetricValue = number;
-
-// Constants: UPPER_SNAKE_CASE
-const MAX_HEART_RATE = 220;
-const API_BASE_URL = "https://api.example.com";
-
-// Files: kebab-case
-// health-metrics.ts
-// user-profile.service.ts
-```
-
-#### Python
 ```python
 # Variables and functions: snake_case
-user_name = "John"
-def calculate_bmi():
+user_input = "15.2"
+def calculate_average():
     pass
 
-# Classes: PascalCase
-class HealthMetric:
+# Classes: PascalCase (if adding classes)
+class LabResult:
     pass
 
 # Constants: UPPER_SNAKE_CASE
-MAX_HEART_RATE = 220
-API_BASE_URL = "https://api.example.com"
+DEFAULT_DATE_FORMAT = '%m/%d/%y'
+MAX_PLOT_WIDTH = 10
 ```
 
-### Code Organization
+### German vs English
 
-1. **Import Order**
-   ```typescript
-   // 1. External dependencies
-   import React from 'react';
-   import axios from 'axios';
+Current codebase mixes German and English:
+- Data fields: German (`Bezeichnung`, `Wert`, `Datum`, `Einheit`, `Grenzwert`)
+- Code: English (variable names, function names)
+- UI Labels: Mix of both
 
-   // 2. Internal modules
-   import { HealthMetric } from '@/models';
-   import { formatDate } from '@/utils';
+**Recommendation:**
+- Keep data fields as-is for backward compatibility
+- Use English for all new code
+- Add translation layer for multilanguage support (see ARCHITECTURE_REVIEW.md)
 
-   // 3. Relative imports
-   import { Header } from '../components';
+### Function Documentation
 
-   // 4. Styles
-   import styles from './styles.module.css';
-   ```
+```python
+def save_plots(df, grouped, plots_dir='plots'):
+    """
+    Generate and save time-series plots for all metrics.
 
-2. **Component Structure (React)**
-   ```typescript
-   // 1. Imports
-   // 2. Types/Interfaces
-   // 3. Constants
-   // 4. Component definition
-   // 5. Styled components (if any)
-   // 6. Export
-   ```
+    Creates PNG files in the plots directory, one per measurement type.
+    Plots include measured values over time with normal range overlay.
+
+    Args:
+        df (pd.DataFrame): Full dataset with all measurements
+        grouped (pd.GroupBy): DataFrame grouped by 'Bezeichnung'
+        plots_dir (str): Directory to save PNG files (default: 'plots')
+
+    Returns:
+        None
+
+    Side Effects:
+        - Creates/overwrites PNG files in plots_dir
+        - Creates plots_dir if it doesn't exist
+    """
+    pass
+```
+
+### Error Handling
+
+```python
+# Good - Specific error handling
+def save_new_entry():
+    try:
+        wert = float(wert_var.get())
+    except ValueError:
+        messagebox.showerror("Input Error",
+                           "Please enter a valid numeric value for 'Wert'.")
+        return
+
+    try:
+        datum = pd.to_datetime(datum, format='%m/%d/%y').date()
+    except ValueError:
+        messagebox.showerror("Input Error",
+                           "Please enter the date in MM/DD/YY format.")
+        return
+
+    # ... proceed with saving
+```
+
+---
+
+## Testing Strategy
+
+### Current State
+- ⚠️ No automated tests currently exist
+- Manual testing only
+
+### Recommended Testing Approach
+
+1. **Unit Tests** - Test individual functions
+
+```python
+# tests/test_functions.py
+import unittest
+from Functions import sanitize_filename, import_sanitize
+
+class TestFunctions(unittest.TestCase):
+
+    def test_sanitize_filename(self):
+        """Test filename sanitization"""
+        self.assertEqual(
+            sanitize_filename("Total Protein"),
+            "total_protein"
+        )
+        self.assertEqual(
+            sanitize_filename("LDL/HDL Ratio"),
+            "ldl-hdl_ratio"
+        )
+
+    def test_import_sanitize_valid_csv(self):
+        """Test CSV import with valid data"""
+        df, grouped = import_sanitize('test_data.csv')
+        self.assertIsNotNone(df)
+        self.assertEqual(len(df), expected_rows)
+```
+
+2. **Integration Tests** - Test workflows
+
+```python
+def test_add_and_retrieve_measurement():
+    """Test adding a measurement and retrieving it"""
+    # Add new measurement
+    add_measurement("Hemoglobin", 15.2, "08/15/24", "g/dL")
+
+    # Retrieve and verify
+    df, _ = import_sanitize('lab_results_aug24.csv')
+    latest = df[df['Bezeichnung'] == 'Hemoglobin'].iloc[-1]
+
+    assert latest['Wert'] == 15.2
+    assert latest['Datum'] == pd.to_datetime('08/15/24')
+```
+
+3. **GUI Tests** (Advanced)
+
+Consider using `pytest` with `pytest-qt` for GUI testing after modernization.
+
+---
+
+## Common Tasks
+
+### Task 1: Adding a New Measurement Type
+
+```python
+# In LabDataManagerUI.py, when "Neue Bezeichnung" is selected:
+
+# 1. User enters new measurement name and unit
+neue_bezeichnung = "Vitamin D"
+neue_einheit = "ng/mL"
+
+# 2. System creates new entry
+new_row = pd.DataFrame({
+    'Bezeichnung': [neue_bezeichnung],
+    'Einheit': [neue_einheit],
+    'Wert': [value],
+    'Datum': [date],
+    'unterer Grenzwert': [None],  # Set later in Edit Grenzwerte
+    'oberer Grenzwert': [None]
+})
+
+# 3. Append to dataframe and save
+df = pd.concat([df, new_row], ignore_index=True)
+df.to_csv(filename, index=False)
+```
+
+### Task 2: Updating Reference Ranges
+
+```python
+# Update all records of a specific measurement type
+df.loc[df['Bezeichnung'] == selected_bezeichnung, 'unterer Grenzwert'] = lower
+df.loc[df['Bezeichnung'] == selected_bezeichnung, 'oberer Grenzwert'] = upper
+
+# Save changes
+df['Datum'] = df['Datum'].dt.strftime('%m/%d/%y')
+df.to_csv(filename, index=False)
+```
+
+### Task 3: Adding a New Visualization
+
+```python
+# In Functions.py, modify save_plots():
+
+def save_plots(df, grouped, plots_dir='plots'):
+    for name, group in grouped:
+        # ... existing code ...
+
+        # Add new visualization element
+        # Example: Add min/max annotations
+        plt.annotate(
+            f'Max: {group["Wert"].max():.1f}',
+            xy=(group['Datum'].iloc[-1], group['Wert'].max()),
+            xytext=(10, 10),
+            textcoords='offset points'
+        )
+
+        # Save plot
+        plt.savefig(filename)
+        plt.close()
+```
+
+### Task 4: Adding CSV Import
+
+See detailed implementation in ARCHITECTURE_REVIEW.md, Priority 2, Item #7.
+
+Basic structure:
+
+```python
+def import_csv_wizard():
+    """Interactive wizard for importing external CSV files"""
+    # 1. File selection
+    filepath = filedialog.askopenfilename(
+        title="Select CSV file",
+        filetypes=[("CSV files", "*.csv")]
+    )
+
+    # 2. Preview and column mapping
+    preview_df = pd.read_csv(filepath, nrows=5)
+    # Show UI for mapping columns
+
+    # 3. Import data
+    external_df = pd.read_csv(filepath)
+    for _, row in external_df.iterrows():
+        # Map columns and add to main dataframe
+        pass
+```
+
+---
+
+## Modernization Priorities
+
+Based on [ARCHITECTURE_REVIEW.md](./ARCHITECTURE_REVIEW.md), prioritize improvements in this order:
+
+### Priority 1: Critical (Do First) ⭐⭐⭐
+
+1. **Migrate to SQLite**
+   - Replace CSV with SQLite database
+   - Use SQLAlchemy ORM
+   - Maintain CSV export for compatibility
+   - **Impact:** Data integrity, future capabilities
+   - **Effort:** 2-3 days
+
+2. **Implement Automated Backups**
+   - Auto-backup database on launch and after changes
+   - Keep last 30 backups
+   - **Impact:** Prevent data loss
+   - **Effort:** 2-4 hours
+
+3. **Modernize UI**
+   - Option A: CustomTkinter (easier, desktop)
+   - Option B: Streamlit (better UX, web-based)
+   - **Impact:** Dramatically better user experience
+   - **Effort:** 1-2 days (CustomTkinter) or 3-5 days (Streamlit)
+
+### Priority 2: Important (Next) ⭐⭐
+
+4. **Separate Reference Values Management**
+   - Create reference values table/database
+   - Add source citations
+   - Support age/gender-specific ranges
+   - **Impact:** Better data management
+   - **Effort:** 1-2 days
+
+5. **Add Multilanguage Support**
+   - Externalize all UI strings
+   - Support German, English, and others
+   - **Impact:** Broader user base
+   - **Effort:** 1 day + ongoing translations
+
+6. **Improve Visualizations**
+   - Use Plotly for interactive charts
+   - Add trend lines and statistics
+   - **Impact:** Better insights
+   - **Effort:** 1-2 days
+
+7. **CSV Import Wizard**
+   - Import data from other sources
+   - Column mapping UI
+   - **Impact:** Easier data entry
+   - **Effort:** 2-3 days
+
+### Priority 3: Nice-to-Have ⭐
+
+8. **Package as Standalone App** (PyInstaller)
+9. **Add Statistical Analysis** (trends, health scores)
+10. **Optional Cloud Backup**
 
 ---
 
@@ -290,334 +476,123 @@ API_BASE_URL = "https://api.example.com"
 
 ### When Working on This Project
 
-#### 1. Always Check Context First
-- Read relevant files before making changes
-- Understand existing patterns and conventions
-- Look for similar implementations in the codebase
+1. **Always Verify Data Format**
+   - Dates must be in mm/dd/yy format
+   - CSV must have all 6 columns
+   - Numeric values must be valid floats
 
-#### 2. Plan Before Implementing
-- Use TodoWrite tool for multi-step tasks
-- Break down complex features into smaller tasks
-- Communicate your plan before starting
+2. **Preserve Backward Compatibility**
+   - Don't break existing CSV format
+   - Maintain export functionality
+   - Test with existing data files
 
-#### 3. Follow Security Best Practices
-- Never commit sensitive data (API keys, passwords)
-- Validate and sanitize all user inputs
-- Use parameterized queries for database operations
-- Implement proper authentication and authorization
-- Follow OWASP Top 10 security guidelines
+3. **Test Data Changes Carefully**
+   - Always backup lab_results_aug24.csv before modifying
+   - Validate CSV integrity after changes
+   - Ensure plots regenerate correctly
 
-#### 4. Write Tests
-- Write unit tests for business logic
-- Add integration tests for API endpoints
-- Consider edge cases and error scenarios
-- Aim for meaningful test coverage (not just high %)
+4. **Follow Existing Patterns**
+   - Use pandas for data manipulation
+   - Use tkinter messagebox for user feedback
+   - Use matplotlib for new visualizations
 
-#### 5. Documentation
-- Update README.md when adding features
-- Document API endpoints (use OpenAPI/Swagger)
-- Add JSDoc/docstrings for complex functions
-- Keep CLAUDE.md updated with architectural changes
+5. **Document Changes**
+   - Update function docstrings
+   - Add comments for complex logic
+   - Update README if user-facing changes
 
-#### 6. Code Quality
-- Run linters and formatters before committing
-- Fix all TypeScript/linting errors
-- Ensure code builds successfully
-- Test changes locally before pushing
+6. **Consider Modernization**
+   - When adding features, consider if they align with modernization goals
+   - Suggest SQLite migration if adding complex data queries
+   - Propose web UI if adding features that benefit from it
 
-#### 7. Git Practices
-- Write clear, descriptive commit messages
-- Keep commits atomic and focused
-- Don't commit commented-out code
-- Use `.gitignore` properly
-
-#### 8. Communication
-- Ask clarifying questions when requirements are unclear
-- Explain complex changes in PR descriptions
-- Highlight breaking changes
-- Suggest alternatives when appropriate
-
-### Common Tasks
-
-#### Adding a New Health Metric
-1. Define the data model/schema
-2. Create database migration (if applicable)
-3. Add API endpoints (CRUD operations)
-4. Implement frontend components
-5. Add validation logic
-6. Write tests
-7. Update documentation
-
-#### Creating a New API Endpoint
-1. Define route in appropriate router file
-2. Create controller function
-3. Add validation middleware
-4. Implement business logic
-5. Add error handling
-6. Write tests
-7. Document in API documentation
-
-#### Adding a UI Component
-1. Create component file in appropriate directory
-2. Implement component logic
-3. Add styling
-4. Write prop types/interfaces
-5. Add to component library/exports
-6. Write tests
-7. Add to Storybook (if used)
+7. **Security & Privacy**
+   - Never add cloud dependencies without user consent
+   - Keep data local by default
+   - Encrypt sensitive data if adding cloud features
 
 ---
 
 ## Security Considerations
 
-### Critical Security Rules
+### Current Security Posture
 
-1. **Never Store Sensitive Data in Code**
-   - Use environment variables for secrets
-   - Add `.env` to `.gitignore`
-   - Provide `.env.example` with dummy values
+**Strengths:**
+- ✅ Local storage (no network exposure)
+- ✅ No external dependencies for data
+- ✅ User controls all data
 
-2. **Input Validation**
-   - Validate all user inputs on both client and server
-   - Use schema validation libraries (Joi, Zod, etc.)
-   - Sanitize data before storage
+**Risks:**
+- ⚠️ CSV files are not encrypted
+- ⚠️ No access controls (anyone with file access can read data)
+- ⚠️ No data integrity checks (CSV could be manually edited incorrectly)
 
-3. **Authentication & Authorization**
-   - Use established libraries (Passport.js, Auth0, etc.)
-   - Implement JWT or session-based auth properly
-   - Validate tokens on protected routes
-   - Use HTTPS in production
+### Recommendations
 
-4. **Database Security**
-   - Use parameterized queries/ORMs
-   - Never concatenate SQL strings
-   - Implement proper access controls
-   - Encrypt sensitive data at rest
+1. **If Adding Cloud Features**
+   - Encrypt data before upload
+   - Use user-controlled encryption keys
+   - Make cloud sync opt-in
 
-5. **Health Data Privacy**
-   - Comply with HIPAA (if applicable in US)
-   - Follow GDPR guidelines (if serving EU users)
-   - Implement data encryption
-   - Provide data export/deletion capabilities
-   - Add privacy policy and terms of service
+2. **If Migrating to SQLite**
+   - Consider SQLCipher for encrypted database
+   - Add data integrity constraints
+   - Implement proper error handling
 
-6. **API Security**
-   - Implement rate limiting
-   - Use CORS properly
-   - Validate request origins
-   - Log security events
+3. **If Adding User Accounts**
+   - Hash passwords (bcrypt/argon2)
+   - Implement proper session management
+   - Add audit logging
 
 ---
 
-## Testing Strategy
+## Useful Commands
 
-### Test Pyramid
-
-```
-        /\
-       /E2E\         <- Few, high-value end-to-end tests
-      /------\
-     /  Intg  \      <- Integration tests for APIs, components
-    /----------\
-   /    Unit    \    <- Many unit tests for logic
-  /--------------\
-```
-
-### Unit Tests
-- Test individual functions and methods
-- Mock external dependencies
-- Fast execution
-- High coverage for business logic
-
-### Integration Tests
-- Test API endpoints
-- Test database operations
-- Test component integration
-- Use test database
-
-### End-to-End Tests
-- Test critical user flows
-- Test in browser environment
-- Use tools like Cypress, Playwright
-- Run in CI/CD pipeline
-
-### Test File Naming
-```
-src/utils/date-formatter.ts
-tests/unit/utils/date-formatter.test.ts
-
-src/api/controllers/metrics.controller.ts
-tests/integration/api/metrics.api.test.ts
-```
-
----
-
-## Development Environment Setup
-
-### Prerequisites (To Be Determined)
-Once the technology stack is chosen, document:
-- Required software versions (Node.js, Python, etc.)
-- Database setup instructions
-- Environment variables needed
-- IDE recommendations and extensions
-
-### Getting Started (Template)
 ```bash
-# Clone the repository
-git clone <repo-url>
-cd HealthTracker
+# Run application
+python LabDataManagerUI.py
 
-# Install dependencies
-# (commands will vary based on tech stack)
+# Run with specific CSV file
+python LabDataManagerUI.py --file=my_data.csv
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your values
+# Generate plots only (if you add this feature)
+python Functions.py --generate-plots
 
-# Run database migrations
-# (if applicable)
+# Run tests (once added)
+pytest tests/
 
-# Start development server
-# (command TBD)
+# Code formatting
+black *.py
+
+# Linting
+flake8 *.py
+pylint *.py
 ```
 
 ---
 
-## API Design Guidelines (Future)
+## Resources
 
-### RESTful Conventions
-```
-GET    /api/metrics              # List all metrics
-GET    /api/metrics/:id          # Get specific metric
-POST   /api/metrics              # Create new metric
-PUT    /api/metrics/:id          # Update metric
-DELETE /api/metrics/:id          # Delete metric
-```
-
-### Response Format
-```json
-{
-  "success": true,
-  "data": {},
-  "message": "Operation successful",
-  "timestamp": "2025-11-16T12:00:00Z"
-}
-```
-
-### Error Response Format
-```json
-{
-  "success": false,
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Invalid input data",
-    "details": []
-  },
-  "timestamp": "2025-11-16T12:00:00Z"
-}
-```
-
----
-
-## Data Models (Future)
-
-### Core Entities (Suggestions)
-
-1. **User**
-   - id, email, password_hash, name, date_of_birth, gender
-   - created_at, updated_at
-
-2. **HealthMetric**
-   - id, user_id, metric_type, value, unit, timestamp
-   - notes, created_at
-
-3. **Activity**
-   - id, user_id, activity_type, duration, distance
-   - calories_burned, timestamp, notes
-
-4. **Goal**
-   - id, user_id, goal_type, target_value, deadline
-   - status, created_at, achieved_at
-
-5. **Measurement**
-   - id, user_id, measurement_type, value, unit, timestamp
-
----
-
-## Performance Considerations
-
-### Database
-- Index frequently queried fields
-- Use connection pooling
-- Implement caching where appropriate
-- Optimize queries (avoid N+1 problems)
-
-### Frontend
-- Code splitting and lazy loading
-- Optimize images and assets
-- Minimize bundle size
-- Use memoization for expensive computations
-
-### API
-- Implement pagination for list endpoints
-- Use compression for responses
-- Cache static resources
-- Rate limiting to prevent abuse
-
----
-
-## Accessibility
-
-Ensure the application is accessible:
-- Use semantic HTML
-- Provide alt text for images
-- Ensure keyboard navigation works
-- Maintain sufficient color contrast
-- Support screen readers
-- Follow WCAG 2.1 guidelines
-
----
-
-## Deployment (Future)
-
-Document deployment process once determined:
-- Hosting platform
-- CI/CD pipeline setup
-- Environment configuration
-- Database hosting
-- Monitoring and logging
-- Backup strategy
-
----
-
-## Changelog
-
-### 2025-11-16 - Initial Creation
-- Created CLAUDE.md with comprehensive guidelines
-- Documented repository structure and conventions
-- Added AI assistant guidelines
-- Established security and testing strategies
+- **Python Tkinter Docs:** https://docs.python.org/3/library/tkinter.html
+- **pandas Documentation:** https://pandas.pydata.org/docs/
+- **matplotlib Documentation:** https://matplotlib.org/stable/contents.html
+- **PEP 8 Style Guide:** https://pep8.org/
+- **CustomTkinter:** https://github.com/TomSchimansky/CustomTkinter
+- **Streamlit:** https://streamlit.io/
 
 ---
 
 ## Questions or Issues?
 
-When you need guidance:
-1. Check this CLAUDE.md file first
-2. Look for similar patterns in the codebase
-3. Ask the project maintainer for clarification
-4. Document decisions for future reference
+1. Check [ARCHITECTURE_REVIEW.md](./ARCHITECTURE_REVIEW.md) for architecture guidance
+2. Review [next.md](./next.md) for planned features
+3. Look for similar patterns in existing code
+4. Ask the project maintainer for clarification
 
 ---
 
-## Useful Resources
+**Remember:** This application prioritizes **simplicity**, **privacy**, and **user control**. Any changes should maintain these core values while improving functionality and user experience.
 
-- [Conventional Commits](https://www.conventionalcommits.org/)
-- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-- [HIPAA Compliance Guide](https://www.hhs.gov/hipaa/index.html)
-- [GDPR Overview](https://gdpr.eu/)
-- [REST API Best Practices](https://restfulapi.net/)
+**Current Focus:** Working desktop app → Modernized desktop app → Optional web version
 
----
-
-**Remember:** This document is a living guide. Update it as the project evolves, patterns emerge, and decisions are made. Keep it accurate and relevant to help all contributors (human and AI) work effectively on HealthTracker.
+Keep it simple, keep it local, keep it user-focused! 🏥📊
